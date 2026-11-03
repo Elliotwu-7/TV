@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.fragment;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,6 +12,9 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
+import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.api.config.PortalSources;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.api.config.WallConfig;
@@ -136,6 +140,36 @@ public class SettingFragment extends BaseFragment implements ConfigListener, Sit
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.wallRefresh.setOnLongClickListener(this::onWallHistory);
+        mBinding.settingToolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+    }
+
+    private boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.z10RefreshSources) {
+            Notify.progress(requireActivity());
+            Task.execute(() -> {
+                try {
+                    int[] counts = PortalSources.refresh();
+                    App.post(() -> {
+                        Notify.dismiss();
+                        if (!isAdded()) return;
+                        // Re-parse active portal configurations without reloading custom sources.
+                        if (PortalSources.isHome(VodConfig.getUrl())) VodConfig.load(VodConfig.get().getConfig(), getCallback());
+                        if (PortalSources.isHome(LiveConfig.getUrl())) LiveConfig.load(LiveConfig.get().getConfig(), getCallback());
+                        Notify.show(getString(R.string.z10_sources_updated, counts[0], counts[1]));
+                    });
+                } catch (Exception e) {
+                    App.post(() -> { Notify.dismiss(); Notify.show(e.getMessage()); });
+                }
+            });
+            return true;
+        }
+        if (item.getItemId() == R.id.z10RestoreSources) {
+            Config.find(PortalSources.HOME, "Z10 BOX · 默认点播", 0).update();
+            Config.find(PortalSources.LIVE_HOME, "Z10 BOX · 默认直播", 1).update();
+            initConfig();
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -56,6 +56,9 @@ public class Download {
 
     private void doInBackground() {
         try (Response res = OkHttp.newCall(url, tag).execute()) {
+            if (!res.isSuccessful() || res.body() == null) throw new IOException("HTTP " + res.code());
+            long length = res.body().contentLength();
+            if (length > 64L * 1024L * 1024L) throw new IOException("文件过大");
             download(res.body().byteStream(), getLength(res));
             if (callback != null) App.post(() -> callback.success(file));
         } catch (Exception e) {

@@ -115,7 +115,8 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
         int maxWidth = ResUtil.getScreenWidth() / (getCount() + 1) - ResUtil.dp2px(40);
         for (Site site : mSites) width = Math.max(width, ResUtil.getTextWidth(site.getName(), 14));
         int contentWidth = width + space;
-        int minWidth = ResUtil.dp2px(120);
+        boolean wideCar = requireActivity().getResources().getConfiguration().smallestScreenWidthDp >= 1000;
+        int minWidth = ResUtil.dp2px(wideCar ? 176 : 120);
         int finalWidth = Math.clamp(contentWidth, minWidth, Math.max(minWidth, maxWidth));
         ViewGroup.LayoutParams params = mBinding.collect.getLayoutParams();
         params.width = finalWidth;

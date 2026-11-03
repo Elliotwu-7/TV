@@ -16,10 +16,18 @@ class LiveFallbackPolicy {
         this.host = host;
     }
 
-    void playbackError() {
+    boolean canAutoFallback() {
+        return LiveSetting.isChange() && state.getChannel() != null;
+    }
+
+    boolean playbackError() {
         Channel channel = state.getChannel();
-        if (!LiveSetting.isChange() || channel == null || channel.isLast()) return;
-        controller.nextLine(true);
+        if (!canAutoFallback()) return false;
+        if (!channel.isOnly() && !channel.isLast()) {
+            controller.nextLine(true);
+            return true;
+        }
+        return controller.fallbackToNextLiveSource();
     }
 
     void playbackEnded() {

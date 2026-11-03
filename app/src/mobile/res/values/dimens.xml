@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="z10_nav_height">56dp</dimen>
+    <dimen name="z10_nav_icon_size">24dp</dimen>
+    <dimen name="z10_toolbar_height">56dp</dimen>
+    <dimen name="z10_toolbar_logo_size">36dp</dimen>
+    <dimen name="z10_toolbar_logo_margin">12dp</dimen>
+    <dimen name="z10_toolbar_title">20sp</dimen>
+    <dimen name="z10_type_text">14sp</dimen>
+    <dimen name="z10_type_margin">8dp</dimen>
+    <dimen name="z10_vod_margin">8dp</dimen>
+    <dimen name="z10_vod_image_min_height">80dp</dimen>
+    <dimen name="z10_vod_badge_text">12sp</dimen>
+    <dimen name="z10_vod_name_min">12sp</dimen>
+    <dimen name="z10_vod_name_max">14sp</dimen>
+    <dimen name="z10_vod_oval_name">14sp</dimen>
+    <dimen name="z10_search_height">128dp</dimen>
+    <dimen name="z10_search_image_width">96dp</dimen>
+    <dimen name="z10_search_padding">8dp</dimen>
+    <dimen name="z10_search_name">14sp</dimen>
+    <dimen name="z10_search_remark">12sp</dimen>
+    <dimen name="z10_collect_sidebar_width">120dp</dimen>
+    <dimen name="z10_video_width">400dp</dimen>
+    <dimen name="z10_video_height">225dp</dimen>
+    <dimen name="z10_video_margin">16dp</dimen>
+    <dimen name="z10_detail_title">20sp</dimen>
+    <dimen name="z10_detail_meta">14sp</dimen>
+    <dimen name="z10_detail_section">16sp</dimen>
+    <dimen name="z10_detail_content">14sp</dimen>
+</resources>

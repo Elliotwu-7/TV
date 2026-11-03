@@ -17,7 +17,9 @@ public class Product {
     public static int getColumn(Context context) {
         int count = ResUtil.isLand(context) ? 7 : 5;
         count = count + (ResUtil.isPad() ? 1 : 0);
-        return Math.abs(PlayerSetting.getSize() - count);
+        count = Math.abs(PlayerSetting.getSize() - count);
+        if (isWideCarScreen(context)) count = Math.max(4, Math.min(5, count));
+        return count;
     }
 
     public static int getColumn(Context context, Style style) {
@@ -49,5 +51,9 @@ public class Product {
         int left = cutout.getSafeInsetLeft();
         int right = cutout.getSafeInsetRight();
         return left | right;
+    }
+
+    private static boolean isWideCarScreen(Context context) {
+        return ResUtil.isLand(context) && context.getResources().getConfiguration().smallestScreenWidthDp >= 1000;
     }
 }

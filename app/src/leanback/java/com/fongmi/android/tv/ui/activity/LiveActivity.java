@@ -76,7 +76,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
 
@@ -102,6 +104,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private Clock mClock;
     private View mFocus2;
     private int count;
+    private final Set<String> mFailedLiveSources = new LinkedHashSet<>();
+    private final Runnable mClearFailedSources = mFailedLiveSources::clear;
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, LiveActivity.class).putExtra("empty", LiveConfig.isEmpty()));
@@ -187,6 +191,10 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.speed.setDownListener(this::onSpeedSub);
         mBinding.control.action.text.setUpListener(this::onSubtitleClick);
         mBinding.control.action.text.setDownListener(this::onSubtitleClick);
+        mBinding.control.action.channelList.setOnClickListener(view -> {
+            hideControl();
+            showUI();
+        });
         mBinding.control.action.home.setOnClickListener(view -> onHome());
         mBinding.control.action.line.setOnClickListener(view -> onLine());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
@@ -277,7 +285,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void getLive() {
-        mBinding.control.action.home.setText(LiveConfig.isOnly() ? getString(R.string.live_refresh) : getHome().getName());
+        mBinding.control.action.home.setText(LiveConfig.isOnly() ? getString(R.string.live_refresh) : getString(R.string.live_source_format, getHome().getName()));
         mViewModel.parse(getHome());
         showProgress();
     }
@@ -454,12 +462,12 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
         @Override
         public void onNext() {
-            mLive.nextChannel();
+            nextChannel();
         }
 
         @Override
         public void onPrev() {
-            mLive.prevChannel();
+            prevChannel();
         }
 
         @Override
@@ -485,6 +493,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onError(String msg) {
+        App.removeCallbacks(mClearFailedSources);
         mLive.playbackError(msg);
     }
 
@@ -497,13 +506,16 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     protected void onStateChanged(int state) {
         switch (state) {
             case Player.STATE_BUFFERING:
+                App.removeCallbacks(mClearFailedSources);
                 showProgress();
                 break;
             case Player.STATE_READY:
+                App.post(mClearFailedSources, 3000);
                 hideProgress();
                 player().reset();
                 break;
             case Player.STATE_ENDED:
+                App.removeCallbacks(mClearFailedSources);
                 mLive.playbackEnded();
                 break;
         }
@@ -612,7 +624,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private void onToggle() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
         else if (isVisible(mBinding.recycler)) hideUI();
-        else showUI();
+        else showControl(getFocus2());
         hideInfo();
     }
 
@@ -645,6 +657,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void onItemClick(Channel item) {
+        clearFailedSources();
         if (!item.getData(mViewModel.getZoneId()).getList().isEmpty() && item.isSelected() && mChannel != null && mChannel.equals(item) && mChannel.getGroup().equals(mGroup)) {
             showEpg(item);
         } else if (mGroup != null) {
@@ -723,6 +736,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private void stopPlayer() {
         player().clear();
         player().stop();
+        player().clearMediaItems();
     }
 
     @Override
@@ -775,6 +789,23 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     public void resetPlaybackForError(String msg) {
         PlaybackReset.afterError(player());
         showError(msg);
+    }
+
+    @Override
+    public boolean fallbackToNextLiveSource(Channel channel) {
+        LiveConfig config = LiveConfig.get();
+        List<Live> lives = config.getLives();
+        if (channel == null || lives.size() <= 1) return false;
+        Live current = config.getHome();
+        mFailedLiveSources.add(current.getName());
+        config.setKeep(channel);
+        for (Live item : lives) {
+            if (item.getName().equals(current.getName()) || mFailedLiveSources.contains(item.getName())) continue;
+            item.keep(channel).save();
+            setLive(item, true);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -860,6 +891,12 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void setLive(Live item) {
+        setLive(item, false);
+    }
+
+    private void setLive(Live item, boolean automatic) {
+        App.removeCallbacks(mClearFailedSources);
+        if (!automatic) clearFailedSources();
         if (item.isSelected()) item.getGroups().clear();
         LiveConfig.get().setHome(item);
         player().reset();
@@ -867,6 +904,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         player().stop();
         resetAdapter();
         hideControl();
+        mViewModel.resetPlayback();
         mLive.reset();
         getLive();
     }
@@ -912,19 +950,28 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void prevChannel() {
+        clearFailedSources();
         mLive.prevChannel();
     }
 
     private void nextChannel() {
+        clearFailedSources();
         mLive.nextChannel();
     }
 
     private void prevLine() {
+        clearFailedSources();
         mLive.prevLine();
     }
 
     private void nextLine(boolean show) {
+        if (!show) clearFailedSources();
         mLive.nextLine(show);
+    }
+
+    private void clearFailedSources() {
+        App.removeCallbacks(mClearFailedSources);
+        mFailedLiveSources.clear();
     }
 
     private void seek(long time) {
@@ -1011,7 +1058,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     public void onKeyCenter() {
         hideInfo();
-        showUI();
+        checkPlay();
     }
 
     @Override
@@ -1027,8 +1074,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     public void onDoubleTap() {
         if (isVisible(mBinding.recycler)) hideUI();
-        else if (isVisible(mBinding.control.getRoot())) hideControl();
-        else onMenu();
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        checkPlay();
     }
 
     @Override
@@ -1061,7 +1108,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     protected void onDestroy() {
         mClock.release();
         Source.get().exit();
-        App.removeCallbacks(mR0, mR1, mR2, mR3, mR4);
+        App.removeCallbacks(mClearFailedSources, mR0, mR1, mR2, mR3, mR4);
         super.onDestroy();
     }
 }

@@ -1,0 +1,64 @@
+{
+  "apiDomains": [
+    {
+      "tag": "分流线路",
+      "base": "https://0.wudaozhe.net/tvbox/"
+    },
+    {
+      "tag": "全球线路",
+      "base": "https://1.wudaozhe.net/tvbox/"
+    },
+    {
+      "tag": "备份三线",
+      "base": "https://0.12yue.de5.net/tvbox/"
+    },
+    {
+      "tag": "备份四线",
+      "base": "https://0.cdz.qzz.io/tvbox/"
+    },
+    {
+      "tag": "备份五线",
+      "base": "https://0.wdzb.eu.cc/tvbox/"
+    }
+  ],
+  "liveDomains": [
+    {
+      "tag": "分流线路",
+      "base": "https://0.wudaozhe.net/tvbox/live/"
+    },
+    {
+      "tag": "全球线路",
+      "base": "https://1.wudaozhe.net/tvbox/live/"
+    },
+    {
+      "tag": "备份三线",
+      "base": "https://0.12yue.de5.net/tvbox/live/"
+    },
+    {
+      "tag": "备份四线",
+      "base": "https://0.cdz.qzz.io/tvbox/live/"
+    },
+    {
+      "tag": "备份五线",
+      "base": "https://0.wdzb.eu.cc/tvbox/live/"
+    }
+  ],
+  "apiWeights": {
+    "轮替占位.json": 1,
+    "神马都没有.json": 2,
+    "饭太硬.json": 4,
+    "肥猫已死.json": 5,
+    "摸鱼.json": 6,
+    "王二小.json": 7,
+    "集多已死.json": 8,
+    "潇洒.json": 9,
+    "小米以死.json": 10,
+    "嗷呜.json": 11,
+    "南风已死.json": 12,
+    "幸福年年.json": 13
+  },
+  "sourceFiles": {
+    "list": "list.txt",
+    "live": "livelist.txt"
+  }
+}

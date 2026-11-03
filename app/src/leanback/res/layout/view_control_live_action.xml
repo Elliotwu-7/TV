@@ -13,11 +13,19 @@
         android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/config"
+            android:id="@+id/channel_list"
             style="@style/Control"
             android:layout_marginEnd="8dp"
             android:nextFocusLeft="@id/change"
-            android:text="@string/play_config" />
+            android:nextFocusRight="@id/config"
+            android:text="@string/live_channel" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/config"
+            style="@style/Control"
+            android:layout_marginEnd="8dp"
+            android:nextFocusLeft="@id/channel_list"
+            android:text="@string/play_history" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/home"
@@ -104,8 +112,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/change"
             style="@style/Control"
-            android:nextFocusRight="@id/config"
-            android:text="@string/play_change" />
+            android:nextFocusRight="@id/channel_list"
+            android:text="@string/play_auto_change" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </HorizontalScrollView>

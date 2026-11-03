@@ -8,17 +8,26 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/lock"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/selector_icon_control"
+        android:contentDescription="@string/control_lock"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:nextFocusUp="@id/rotate"
         android:scaleType="center"
         android:src="@drawable/ic_control_lock_off" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/rotate"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/selector_icon_control"
+        android:contentDescription="@string/control_rotate"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:nextFocusDown="@id/lock"
         android:scaleType="center"
         android:src="@drawable/ic_control_rotate" />
 

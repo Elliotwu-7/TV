@@ -4,11 +4,13 @@ import android.text.TextUtils;
 
 import androidx.media3.common.C;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class LivePlaybackController {
 
@@ -102,8 +104,11 @@ public class LivePlaybackController {
     }
 
     public void playbackError(String msg) {
-        host.resetPlaybackForError(msg);
-        fallbackPolicy.playbackError();
+        if (fallbackPolicy.playbackError()) {
+            host.showProgress();
+            return;
+        }
+        host.resetPlaybackForError(fallbackPolicy.canAutoFallback() ? ResUtil.getString(R.string.error_play_live) : msg);
     }
 
     public void playbackEnded() {
@@ -124,6 +129,11 @@ public class LivePlaybackController {
 
     public void nextLine(boolean show) {
         switchLine(true, show);
+    }
+
+    boolean fallbackToNextLiveSource() {
+        Channel channel = state.getChannel();
+        return channel != null && host.fallbackToNextLiveSource(channel);
     }
 
     private void switchLine(boolean next, boolean show) {

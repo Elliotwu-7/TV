@@ -1,0 +1,8 @@
+<resources>
+    <string name="z10_update_local">Z10 BOX 请使用新版安装包更新</string>
+    <string name="z10_module_unavailable">当前 x86_64 版本使用系统解码，暂不支持 MPV 模块</string>
+    <string name="z10_refresh_sources">更新内置数据源</string>
+    <string name="z10_restore_sources">使用默认数据源</string>
+    <string name="z10_sources_updated">已更新 %1$d 个点播源和 %2$d 个直播源</string>
+    <string name="z10_sources_cached">数据源暂不可用，已使用本地缓存</string>
+</resources>

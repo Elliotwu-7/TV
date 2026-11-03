@@ -80,3 +80,6 @@
 -keep class com.google.zxing.qrcode.QRCodeReader { *; }
 -keep class com.google.zxing.qrcode.QRCodeWriter { *; }
 -keep class com.google.zxing.qrcode.decoder.ErrorCorrectionLevel { *; }
+
+# tvbus optionally probes this runtime class via reflection.
+-dontwarn com.github.catvod.Runtime

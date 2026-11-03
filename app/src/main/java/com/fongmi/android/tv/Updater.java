@@ -46,12 +46,17 @@ public class Updater implements Download.Callback, UpdateListener {
     }
 
     public Updater force() {
+        if (BuildConfig.Z10_SYSTEM_CODECS) {
+            Notify.show(R.string.z10_update_local);
+            return this;
+        }
         Notify.show(R.string.update_check);
         Setting.putUpdate(true);
         return this;
     }
 
     public void start(FragmentActivity activity) {
+        if (BuildConfig.Z10_SYSTEM_CODECS) return;
         if (!Setting.getUpdate()) return;
         Task.execute(() -> doInBackground(activity));
     }

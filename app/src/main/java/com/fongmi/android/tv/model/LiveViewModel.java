@@ -66,6 +66,11 @@ public class LiveViewModel extends ViewModel {
         return new LivePlaybackController(host, playbackState);
     }
 
+    public void resetPlayback() {
+        tasks.cancel(TaskType.URL);
+        playbackState.reset();
+    }
+
     public void parse(Live item) {
         execute(TaskType.LIVE, () -> {
             LiveApi.parse(item);

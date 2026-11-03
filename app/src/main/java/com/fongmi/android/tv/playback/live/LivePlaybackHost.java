@@ -41,6 +41,10 @@ public interface LivePlaybackHost {
 
     void resetPlaybackForError(String msg);
 
+    default boolean fallbackToNextLiveSource(Channel channel) {
+        return false;
+    }
+
     void renderGroupSelection(Group group);
 
     void renderGroupChannels(Group group);

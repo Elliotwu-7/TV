@@ -10,7 +10,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/z10_toolbar_height"
         app:contentInsetEnd="16dp"
         app:navigationIconTint="@android:color/white">
 

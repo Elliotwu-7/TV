@@ -9,7 +9,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/z10_toolbar_height"
         app:navigationIconTint="@android:color/white"
         app:titleTextAppearance="@style/ToolbarTextAppearance" />
 
@@ -20,7 +20,7 @@
 
         <com.fongmi.android.tv.ui.custom.CustomRecyclerView
             android:id="@+id/collect"
-            android:layout_width="120dp"
+            android:layout_width="@dimen/z10_collect_sidebar_width"
             android:layout_height="match_parent"
             android:layout_marginTop="-8dp"
             android:clipChildren="false"

@@ -8,7 +8,7 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/z10_toolbar_height"
         app:navigationIconTint="@android:color/white"
         app:title="@string/player_decode_setting"
         app:titleTextAppearance="@style/ToolbarTextAppearance" />

@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.base;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 import android.graphics.Color;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.DisplayCutout;
@@ -35,6 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         enableEdgeToEdge();
         enableDynamicColor();
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
         initView(savedInstanceState);

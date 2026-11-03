@@ -111,7 +111,7 @@ public class VodConfig extends BaseConfig {
 
     @Override
     protected void load(Config config) throws Throwable {
-        String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
+        String json = PortalSources.vod(config, TAG);
         checkJson(config, Json.parse(json).getAsJsonObject());
     }
 
@@ -178,10 +178,18 @@ public class VodConfig extends BaseConfig {
     private void initSite(Config config, JsonObject object) {
         String spider = Json.safeString(object, "spider");
         BaseLoader.get().parseJar(spider, true);
-        setSites(Json.safeListElement(object, "sites").stream().map(e -> Site.objectFrom(e, spider)).distinct().collect(Collectors.toCollection(ArrayList::new)));
+        setSites(Json.safeListElement(object, "sites").stream().map(e -> Site.objectFrom(e, spider)).filter(site -> !site.isEmpty()).distinct().collect(Collectors.toCollection(ArrayList::new)));
         Map<String, Site> items = Site.findAll().stream().collect(Collectors.toMap(Site::getKey, Function.identity()));
         getSites().forEach(site -> site.sync(items.get(site.getKey())));
-        setHome(config, getSites().isEmpty() ? new Site() : getSites().stream().filter(item -> item.getKey().equals(config.getHome())).findFirst().orElse(getSites().get(0)), false);
+        setHome(config, getSites().isEmpty() ? new Site() : getSites().stream().filter(item -> item.getKey().equals(config.getHome())).findFirst().orElseGet(this::getDefaultHome), false);
+    }
+
+    private Site getDefaultHome() {
+        if (!PortalSources.isX86()) return getSites().get(0);
+        return getSites().stream().filter(item -> item.getType() == 4 && item.getApi().toLowerCase().contains("cj")).findFirst()
+                .or(() -> getSites().stream().filter(item -> item.getType() == 4 && item.getSearchable() > 0).findFirst())
+                .or(() -> getSites().stream().filter(item -> item.getType() == 1 && item.getSearchable() > 0).findFirst())
+                .orElse(getSites().get(0));
     }
 
     private void initParse(Config config, JsonObject object) {

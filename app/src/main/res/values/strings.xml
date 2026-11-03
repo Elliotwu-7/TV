@@ -1,12 +1,23 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
-    <string name="app_name">TV</string>
+    <string name="app_name">Z10 BOX</string>
 
     <!-- Live -->
     <string name="live_pass">Pass</string>
     <string name="live_refresh">Refresh</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>
+    <string name="live_line_default">Line</string>
+    <string name="live_source">Live source</string>
+    <string name="live_channel">Channels</string>
+    <string name="live_source_format">Source: <xliff:g name="name">%1$s</xliff:g></string>
+    <string name="control_back">Back</string>
+    <string name="control_cast">Cast</string>
+    <string name="control_info">Playback info</string>
+    <string name="control_lock">Lock controls</string>
+    <string name="control_rotate">Rotate screen</string>
+    <string name="control_previous_channel">Previous channel</string>
+    <string name="control_next_channel">Next channel</string>
 
     <!-- Detail -->
     <string name="detail_title"><xliff:g name="name">%s</xliff:g> : <xliff:g name="name">%s</xliff:g></string>
@@ -48,6 +59,9 @@
     <string name="play_scale">Default</string>
     <string name="play_config">Config</string>
     <string name="play_change">Change</string>
+    <string name="play_history">History</string>
+    <string name="play_more">More</string>
+    <string name="play_auto_change">Auto switch</string>
     <string name="play_invert">Invert</string>
     <string name="play_across">Across</string>
     <string name="play_reverse">Reverse</string>
@@ -209,6 +223,7 @@
     <string name="error_play_url">Unable to load url</string>
     <string name="error_play_flag">No flag data</string>
     <string name="error_play_timeout">Timed out</string>
+    <string name="error_play_live">All live channels are unavailable. Please switch to another source.</string>
     <string name="error_decode_fallback">Hardware decoding failed, switched to software decoding</string>
     <string name="error_play_tvbus">Error code: <xliff:g name="name">%s</xliff:g></string>
     <string name="error_detail">No play data</string>

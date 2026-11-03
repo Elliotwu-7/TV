@@ -1,12 +1,23 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
-    <string name="app_name">影視</string>
+    <string name="app_name">Z10 BOX</string>
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
     <string name="live_refresh">刷新</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
+    <string name="live_line_default">線路</string>
+    <string name="live_source">直播源</string>
+    <string name="live_channel">頻道</string>
+    <string name="live_source_format">直播源：<xliff:g name="name">%1$s</xliff:g></string>
+    <string name="control_back">返回</string>
+    <string name="control_cast">投屏</string>
+    <string name="control_info">播放資訊</string>
+    <string name="control_lock">鎖定控制</string>
+    <string name="control_rotate">旋轉螢幕</string>
+    <string name="control_previous_channel">上一頻道</string>
+    <string name="control_next_channel">下一頻道</string>
 
     <!-- Detail -->
     <string name="detail_title"><xliff:g name="name">%s</xliff:g>：<xliff:g name="name">%s</xliff:g></string>
@@ -48,6 +59,9 @@
     <string name="play_scale">原始</string>
     <string name="play_config">配置</string>
     <string name="play_change">換源</string>
+    <string name="play_history">歷史</string>
+    <string name="play_more">更多</string>
+    <string name="play_auto_change">自動換源</string>
     <string name="play_invert">反轉</string>
     <string name="play_across">跨類</string>
     <string name="play_reverse">倒序</string>
@@ -208,6 +222,7 @@
     <string name="error_play_url">播放網址載入失敗</string>
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
+    <string name="error_play_live">直播線路均不可用，請切換直播源</string>
     <string name="error_decode_fallback">硬解失敗，已切換軟解</string>
     <string name="error_play_tvbus">錯誤代碼：<xliff:g name="name">%s</xliff:g></string>
     <string name="error_detail">暫無播放資料</string>

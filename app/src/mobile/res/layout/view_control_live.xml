@@ -3,22 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_20">
+    android:background="@drawable/shape_control_overlay">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/top"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/z10_toolbar_height"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/back"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/selector_icon_control"
+            android:contentDescription="@string/control_back"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusDown="@id/play"
             android:scaleType="center"
             android:src="@drawable/ic_control_back" />
 
@@ -26,8 +30,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_weight="1">
 
             <com.google.android.material.textview.MaterialTextView
@@ -37,7 +41,7 @@
                 android:ellipsize="marquee"
                 android:singleLine="true"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 tools:text="CCTV-4K" />
 
         </FrameLayout>
@@ -49,17 +53,26 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/cast"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/selector_icon_control"
+                android:contentDescription="@string/control_cast"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/play"
                 android:scaleType="center"
                 android:src="@drawable/ic_control_cast" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/info"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/selector_icon_control"
+                android:contentDescription="@string/control_info"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/play"
                 android:scaleType="center"
                 android:src="@drawable/ic_control_info" />
 
@@ -76,25 +89,45 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/prev"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/shape_control"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/selector_icon_control"
+            android:contentDescription="@string/control_previous_channel"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/back"
+            android:nextFocusRight="@id/play"
+            android:scaleType="center"
             android:src="@drawable/exo_icon_previous" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/play"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_marginStart="40dp"
             android:layout_marginEnd="40dp"
-            android:background="@drawable/shape_control"
+            android:background="@drawable/selector_icon_control"
+            android:contentDescription="@string/play"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/prev"
+            android:nextFocusRight="@id/next"
+            android:nextFocusDown="@id/channel_list"
+            android:nextFocusUp="@id/back"
+            android:scaleType="center"
             android:src="@drawable/exo_icon_play" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/next"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/shape_control"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/selector_icon_control"
+            android:contentDescription="@string/control_next_channel"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/play"
+            android:nextFocusRight="@id/right"
+            android:scaleType="center"
             android:src="@drawable/exo_icon_next" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -106,22 +139,24 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="4dp" />
+        android:layout_marginEnd="16dp" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@drawable/shape_live_control_bottom"
         android:orientation="vertical"
-        android:paddingBottom="8dp">
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp">
 
         <androidx.media3.ui.PlayerSeekView
             android:id="@+id/seek"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
 
         <include
             android:id="@+id/action"

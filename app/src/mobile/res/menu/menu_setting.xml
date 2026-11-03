@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/z10RefreshSources" android:title="@string/z10_refresh_sources" app:showAsAction="never" />
+    <item android:id="@+id/z10RestoreSources" android:title="@string/z10_restore_sources" app:showAsAction="never" />
+</menu>

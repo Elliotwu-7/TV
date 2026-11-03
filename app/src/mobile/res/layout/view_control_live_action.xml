@@ -1,95 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:scrollbars="none">
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
+        android:id="@+id/primary"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/config"
-            style="@style/Control"
-            android:text="@string/play_config" />
+            android:id="@+id/channel_list"
+            style="@style/LiveControl"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:nextFocusLeft="@id/more"
+            android:nextFocusRight="@id/home"
+            android:nextFocusUp="@id/play"
+            android:text="@string/live_channel"
+            tools:ignore="RtlSymmetry" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/home"
-            style="@style/Control"
-            tools:text="首頁" />
+            style="@style/LiveControl"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:nextFocusLeft="@id/channel_list"
+            android:nextFocusRight="@id/line"
+            android:nextFocusUp="@id/play"
+            android:singleLine="true"
+            android:text="@string/live_source"
+            tools:ignore="RtlSymmetry"
+            tools:text="直播源：银河直播" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/line"
-            style="@style/Control"
-            tools:text="來源 1" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/player"
-            style="@style/Control"
-            android:text="@string/player_engine" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:text="@string/play_decode" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/speed"
-            style="@style/Control"
-            android:fontFeatureSettings="tnum"
-            android:text="@string/play_speed"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            style="@style/LiveControl"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:nextFocusLeft="@id/home"
+            android:nextFocusRight="@id/scale"
+            android:nextFocusUp="@id/play"
+            android:singleLine="true"
+            android:text="@string/live_line_default"
+            tools:ignore="RtlSymmetry"
+            tools:text="线路 1/3" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/scale"
-            style="@style/Control"
-            android:text="@string/play_scale" />
-
-        <View
+            style="@style/LiveControl"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:nextFocusLeft="@id/line"
+            android:nextFocusRight="@id/more"
+            android:nextFocusUp="@id/play"
+            android:text="@string/play_scale"
+            tools:ignore="RtlSymmetry" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text"
-            style="@style/Control"
-            android:tag="3"
-            android:text="@string/play_track_text"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/audio"
-            style="@style/Control"
-            android:tag="1"
-            android:text="@string/play_track_audio" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/video"
-            style="@style/Control"
-            android:tag="2"
-            android:text="@string/play_track_video" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/invert"
-            style="@style/Control"
-            android:text="@string/play_invert" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/across"
-            style="@style/Control"
-            android:text="@string/play_across" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/change"
-            style="@style/Control"
-            android:text="@string/play_change" />
+            android:id="@+id/more"
+            style="@style/LiveControl"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:nextFocusDown="@id/config"
+            android:nextFocusLeft="@id/scale"
+            android:nextFocusRight="@id/channel_list"
+            android:nextFocusUp="@id/play"
+            android:text="@string/play_more" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
-</HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:id="@+id/secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/config"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:nextFocusUp="@id/more"
+                android:text="@string/play_history" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/player"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:text="@string/player_engine" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/decode"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:text="@string/play_decode" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/speed"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:fontFeatureSettings="tnum"
+                android:text="@string/play_speed"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/text"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:tag="3"
+                android:text="@string/play_track_text"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/audio"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:tag="1"
+                android:text="@string/play_track_audio" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/video"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:tag="2"
+                android:text="@string/play_track_video" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/invert"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:text="@string/play_invert" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/across"
+                style="@style/LiveControl"
+                android:layout_marginEnd="8dp"
+                android:text="@string/play_across" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/change"
+                style="@style/LiveControl"
+                android:text="@string/play_auto_change" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </HorizontalScrollView>
+</androidx.appcompat.widget.LinearLayoutCompat>

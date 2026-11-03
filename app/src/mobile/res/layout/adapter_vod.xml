@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="@dimen/z10_vod_margin"
     android:foreground="@drawable/shape_vod">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="@dimen/z10_vod_image_min_height"
         android:background="@color/black_20"
         app:shapeAppearanceOverlay="@style/Vod.Grid" />
 
@@ -36,7 +36,7 @@
         android:background="@drawable/shape_vod_site"
         android:singleLine="true"
         android:textColor="@color/text_site"
-        android:textSize="12sp"
+        android:textSize="@dimen/z10_vod_badge_text"
         android:visibility="gone"
         tools:text="泥巴"
         tools:visibility="visible" />
@@ -50,7 +50,7 @@
         android:background="@drawable/shape_vod_remark"
         android:singleLine="true"
         android:textColor="@color/text_remark"
-        android:textSize="12sp"
+        android:textSize="@dimen/z10_vod_badge_text"
         tools:text="1080p" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -77,8 +77,8 @@
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/white"
-        app:autoSizeMaxTextSize="14sp"
-        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMaxTextSize="@dimen/z10_vod_name_max"
+        app:autoSizeMinTextSize="@dimen/z10_vod_name_min"
         app:autoSizeStepGranularity="1sp"
         app:autoSizeTextType="uniform"
         tools:text="蜘蛛人" />

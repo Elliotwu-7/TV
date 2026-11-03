@@ -13,6 +13,7 @@ android {
         targetSdk libs.versions.targetSdk.get().toInteger()
         python {
             version = "3.10"
+            buildPython providers.gradleProperty('z10BuildPython').getOrElse('python3.10')
             pip {
                 install("-r", "requirements.txt")
             }
@@ -22,13 +23,9 @@ android {
     flavorDimensions = ["abi"]
 
     productFlavors {
-        arm64_v8a {
+        x86_64 {
             dimension "abi"
-            ndk { abiFilters "arm64-v8a" }
-        }
-        armeabi_v7a {
-            dimension "abi"
-            ndk { abiFilters "armeabi-v7a" }
+            ndk { abiFilters "x86_64" }
         }
     }
 

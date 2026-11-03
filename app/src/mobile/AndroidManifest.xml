@@ -23,6 +23,7 @@
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
             android:launchMode="singleTop"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.Splash"
             android:windowSoftInputMode="adjustPan">
 

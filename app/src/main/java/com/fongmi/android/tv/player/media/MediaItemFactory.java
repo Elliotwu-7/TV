@@ -19,7 +19,7 @@ public final class MediaItemFactory {
     }
 
     public static MediaItem from(PlaySpec spec, int decode) {
-        return buildUpon(spec).setDecode(decode).build();
+        return buildUpon(spec).build();
     }
 
     private static MediaItem.Builder buildUpon(PlaySpec spec) {

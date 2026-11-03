@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 public class LiveConfig extends BaseConfig {
 
     private static final String TAG = LiveConfig.class.getSimpleName();
+    private static final String[] QUALITY_SUFFIXES = {"超高清", "超清", "高清", "标清", "蓝光", "原画", "UHD", "FHD", "4K", "8K", "HD", "SD"};
 
     private Live home;
     private List<Live> lives;
@@ -83,7 +84,7 @@ public class LiveConfig extends BaseConfig {
     public LiveConfig config(Config config) {
         this.config = config;
         if (config.isEmpty()) return this;
-        this.sync = config.getUrl().equals(VodConfig.getUrl());
+        this.sync = !PortalSources.isHome(config.getUrl()) && config.getUrl().equals(VodConfig.getUrl());
         return this;
     }
 
@@ -114,6 +115,10 @@ public class LiveConfig extends BaseConfig {
 
     @Override
     protected void load(Config config) throws Throwable {
+        if (PortalSources.isHome(config.getUrl())) {
+            checkJson(config, PortalSources.live(TAG));
+            return;
+        }
         String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
         if (Json.isObj(json)) checkJson(config, Json.parse(json).getAsJsonObject());
         else parseText(config, json);
@@ -211,14 +216,53 @@ public class LiveConfig extends BaseConfig {
         for (int i = 0; i < items.size(); i++) {
             Group group = items.get(i);
             if (group.getName().equals(splits[0])) {
-                int j = group.find(splits[1]);
+                int j = findChannel(group, splits[1]);
                 if (j != -1) {
                     group.getChannel().get(j).setIndex(splits[2]);
                     return new int[]{i, j};
                 }
             }
         }
+        // Sources can use different group names for the same channel. Keep the
+        // channel when automatic source fallback switches to another provider.
+        for (int i = 0; i < items.size(); i++) {
+            Group group = items.get(i);
+            int j = findChannel(group, splits[1]);
+            if (j != -1) {
+                group.getChannel().get(j).setIndex(splits[2]);
+                return new int[]{i, j};
+            }
+        }
         return new int[]{1, 0};
+    }
+
+    private static int findChannel(Group group, String name) {
+        int exact = group.find(name);
+        if (exact != -1) return exact;
+        String expected = normalizeChannelName(name);
+        if (TextUtils.isEmpty(expected)) return -1;
+        for (int i = group.getChannel().size() - 1; i >= 0; i--) {
+            Channel channel = group.getChannel().get(i);
+            if (expected.equals(normalizeChannelName(channel.getName())) || expected.equals(normalizeChannelName(channel.getTvgName()))) return i;
+        }
+        return -1;
+    }
+
+    private static String normalizeChannelName(String name) {
+        if (TextUtils.isEmpty(name)) return "";
+        String value = name.replaceAll("\\s+", "").replace('＋', '+').replaceAll("[\\[\\]()（）【】]", "");
+        boolean stripped;
+        do {
+            stripped = false;
+            for (String suffix : QUALITY_SUFFIXES) {
+                int start = value.length() - suffix.length();
+                if (start <= 0 || !value.regionMatches(true, start, suffix, 0, suffix.length())) continue;
+                value = value.substring(0, start).replaceAll("[-_·:：]+$", "");
+                stripped = true;
+                break;
+            }
+        } while (stripped);
+        return value.replaceAll("[-_·:：]", "");
     }
 
     public int[] findByChannelNumber(String number, List<Group> items) {

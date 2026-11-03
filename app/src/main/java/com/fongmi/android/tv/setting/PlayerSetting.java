@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.provider.Settings;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.BuildConfig;
 import com.github.catvod.utils.Prefers;
 
 public class PlayerSetting {
@@ -22,6 +23,7 @@ public class PlayerSetting {
     private static final float MAX_SPEED = 5.0f;
 
     public static int getEngine() {
+        if (BuildConfig.Z10_SYSTEM_CODECS) return ENGINE_EXO;
         return Math.clamp(Prefers.getInt("player_engine", ENGINE_EXO), ENGINE_EXO, ENGINE_MPV);
     }
 

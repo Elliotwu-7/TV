@@ -527,6 +527,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     public void stopPlaybackForRefresh() {
         player().stop();
         player().clear();
+        player().clearMediaItems();
         mClock.setCallback(null);
     }
 

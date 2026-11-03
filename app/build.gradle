@@ -3,9 +3,14 @@ plugins {
 }
 
 def localProps = new Properties()
-rootProject.file('local.properties').withInputStream {
+if (rootProject.file('local.properties').isFile()) rootProject.file('local.properties').withInputStream {
     localProps.load(it)
 }
+
+def releaseStoreFile = localProps['storeFile'] ?: System.getenv('Z10_RELEASE_STORE_FILE')
+def releaseStorePassword = localProps['storePassword'] ?: System.getenv('Z10_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = localProps['keyAlias'] ?: System.getenv('Z10_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = localProps['keyPassword'] ?: System.getenv('Z10_RELEASE_KEY_PASSWORD')
 
 android {
     namespace = 'com.fongmi.android.tv'
@@ -13,11 +18,12 @@ android {
     compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
-        applicationId "com.fongmi.android.tv"
+        applicationId "com.z10.box"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        versionCode 556
-        versionName "5.5.6"
+        versionCode 2
+        versionName "1.0.1-z10"
+        buildConfigField "boolean", "Z10_SYSTEM_CODECS", "true"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -34,15 +40,19 @@ android {
         mobile {
             dimension "mode"
         }
-        arm64_v8a {
+        x86_64 {
             dimension "abi"
-            ndk { abiFilters "arm64-v8a" }
-        }
-        armeabi_v7a {
-            dimension "abi"
-            ndk { abiFilters "armeabi-v7a" }
+            ndk { abiFilters "x86_64" }
         }
     }
+
+    packaging {
+        jniLibs.excludes += ['**/libmpv.so', '**/libplayer.so', '**/libffmpeg*.so', '**/libav*.so', '**/libsw*.so']
+    }
+
+    sourceSets.main.java.exclude 'com/fongmi/android/tv/player/mpv/MpvErrorMsgProvider.java'
+    sourceSets.main.java.exclude 'com/fongmi/android/tv/player/mpv/MpvPlayerEngine.java'
+    sourceSets.main.java.exclude 'com/fongmi/android/tv/player/mpv/MpvUtil.java'
 
     buildFeatures {
         buildConfig = true
@@ -51,10 +61,12 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(localProps['storeFile'])
-            keyAlias localProps['keyAlias']
-            keyPassword localProps['storePassword']
-            storePassword localProps['storePassword']
+            if (releaseStoreFile) {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
         }
     }
 
@@ -62,7 +74,7 @@ android {
         release {
             minifyEnabled = true
             shrinkResources = true
-            signingConfig = signingConfigs.release
+            if (releaseStoreFile) signingConfig = signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-media.pro'
         }
     }
@@ -94,13 +106,13 @@ androidComponents {
         def mode = flavors['mode'] ?: 'mode'
         def abi = flavors['abi'] ?: 'abi'
         variant.outputs.each { output ->
-            output.outputFileName.set("${mode}-${abi}.apk")
+            output.outputFileName.set("Z10-BOX-${mode}-${abi}.apk")
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"])
+    implementation fileTree(dir: "libs", include: ["*.aar"], exclude: ["lib-mpvplayer-release.aar"])
     implementation project(':catvod')
     implementation project(':chaquo')
     implementation project(':quickjs')

@@ -5,6 +5,7 @@ import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,7 @@ public class VodFallbackPolicy {
     }
 
     private boolean isPass(Site item) {
+        if (!SensitiveContent.isSiteVisible(item)) return false;
         if (state.isAutoFallback() && !item.isChangeable()) return false;
         return item.isSearchable();
     }

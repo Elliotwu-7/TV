@@ -28,6 +28,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.FolderFragment;
 import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -45,7 +46,7 @@ public class VodActivity extends BaseActivity implements TypeAdapter.OnClickList
     }
 
     public static void start(Activity activity, String key, Result result) {
-        if (result == null || result.getTypes().isEmpty()) return;
+        if (result == null || SensitiveContent.filterTypes(result.getTypes()).isEmpty()) return;
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);

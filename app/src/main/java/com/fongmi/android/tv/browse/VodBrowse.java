@@ -17,6 +17,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.setting.Setting;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.utils.Trans;
 import com.google.common.collect.ImmutableList;
@@ -67,7 +68,7 @@ class VodBrowse {
         VodConfig.get().ensureLoaded();
         String keyword = searchKey(query);
         if (TextUtils.isEmpty(keyword)) return ImmutableList.of();
-        List<Site> sites = VodConfig.get().getSites().stream().filter(Site::isSearchable).toList();
+        List<Site> sites = VodConfig.get().getSites().stream().filter(Site::isSearchable).filter(SensitiveContent::isSiteVisible).toList();
         List<ListenableFuture<List<MediaItem>>> futures = sites.stream().map(site -> Task.largeExecutor().submit(() -> searchSite(site, keyword))).toList();
         List<MediaItem> items = collectResults(futures);
         items.sort((a, b) -> matchScore(b, keyword) - matchScore(a, keyword));
@@ -79,7 +80,7 @@ class VodBrowse {
 
     private static List<MediaItem> searchSite(@NonNull Site site, @NonNull String keyword) throws Exception {
         Result result = SiteApi.searchContent(site, keyword, false, "1");
-        return result.getList().stream().map(vod -> BrowseTree.playable(searchId(site.getKey(), vod.getId()), vod.getName(), vod.getRemarks(), vod.getPic())).toList();
+        return SensitiveContent.filterVods(result.getList()).stream().map(vod -> BrowseTree.playable(searchId(site.getKey(), vod.getId()), vod.getName(), vod.getRemarks(), vod.getPic())).toList();
     }
 
     private static List<MediaItem> collectResults(@NonNull List<ListenableFuture<List<MediaItem>>> futures) {
@@ -157,8 +158,9 @@ class VodBrowse {
         History existing = History.find(historyKey);
         if (existing != null) return resolveWithHistory(historyKey, existing);
         VodConfig.get().ensureLoaded();
+        if (!SensitiveContent.isSiteVisible(VodConfig.get().getSite(search.siteKey))) return null;
         Vod vod = SiteApi.detailContent(search.siteKey, search.vodId).getVod();
-        if (TextUtils.isEmpty(vod.getId()) || vod.getFlags().isEmpty()) return null;
+        if (!SensitiveContent.isVodVisible(vod) || TextUtils.isEmpty(vod.getId()) || vod.getFlags().isEmpty()) return null;
         vodCache.put(historyKey, vod);
         History history = createHistory(historyKey, vod);
         Flag resumeFlag = findFlag(vod, history.getVodFlag());
@@ -321,8 +323,9 @@ class VodBrowse {
     @Nullable
     private static Vod fetchDetail(@NonNull History history) throws Exception {
         VodConfig.get().ensureLoaded();
+        if (!SensitiveContent.isSiteVisible(VodConfig.get().getSite(history.getSiteKey()))) return null;
         Vod vod = SiteApi.detailContent(history.getSiteKey(), history.getVodId()).getVod();
-        return TextUtils.isEmpty(vod.getId()) ? null : vod;
+        return !SensitiveContent.isVodVisible(vod) || TextUtils.isEmpty(vod.getId()) ? null : vod;
     }
 
     @Nullable

@@ -15,6 +15,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Diffable;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -88,16 +89,17 @@ public class History implements Diffable<History> {
     }
 
     public static List<History> get(int cid) {
-        return AppDatabase.get().getHistoryDao().find(cid, System.currentTimeMillis() - Constant.HISTORY_TIME);
+        return AppDatabase.get().getHistoryDao().find(cid, System.currentTimeMillis() - Constant.HISTORY_TIME).stream().filter(item -> SensitiveContent.isRecordVisible(item.getSiteKey(), item.getSiteName(), item.getVodName())).toList();
     }
 
     public static History find(String key) {
-        return AppDatabase.get().getHistoryDao().find(VodConfig.getCid(), key);
+        History history = AppDatabase.get().getHistoryDao().find(VodConfig.getCid(), key);
+        return history == null || SensitiveContent.isRecordVisible(history.getSiteKey(), history.getSiteName(), history.getVodName()) ? history : null;
     }
 
     public static List<History> findByName(String name) {
         try {
-            return AppDatabase.get().getHistoryDao().findByName(VodConfig.getCid(), name);
+            return AppDatabase.get().getHistoryDao().findByName(VodConfig.getCid(), name).stream().filter(item -> SensitiveContent.isRecordVisible(item.getSiteKey(), item.getSiteName(), item.getVodName())).toList();
         } catch (Exception e) {
             return Collections.emptyList();
         }

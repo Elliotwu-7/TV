@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.FocusHighlight;
@@ -37,6 +40,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
+import com.fongmi.android.tv.databinding.DialogPassBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.ConfigEvent;
@@ -66,9 +70,11 @@ import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PermissionUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.google.common.collect.Lists;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -132,6 +138,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initEvent() {
+        mBinding.logo.setOnLongClickListener(this::onLogoLong);
         mBinding.title.setListener(this);
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -313,6 +320,38 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setLogo() {
         ImgUtil.logo(mBinding.logo);
+    }
+
+    private boolean onLogoLong(View view) {
+        DialogPassBinding binding = DialogPassBinding.inflate(getLayoutInflater());
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.z10_sensitive_title)
+                .setView(binding.getRoot())
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        dialog.setOnShowListener(ignored -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+                String password = binding.pass.getText().toString();
+                if (!SensitiveContent.isPassword(password)) {
+                    binding.pass.setError(getString(R.string.z10_sensitive_invalid));
+                    return;
+                }
+                if (!VodConfig.get().openSensitive(password)) {
+                    Notify.show(R.string.z10_sensitive_unavailable);
+                    return;
+                }
+                dialog.dismiss();
+            });
+            binding.pass.setOnEditorActionListener((TextView textView, int actionId, KeyEvent event) -> {
+                if (actionId != EditorInfo.IME_ACTION_DONE) return false;
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+                return true;
+            });
+            binding.pass.requestFocus();
+        });
+        dialog.show();
+        return true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -73,6 +73,7 @@ public class PiP {
 
     public void enter(Activity activity, int width, int height, int scale) {
         try {
+            if (Util.isAutomotive(activity)) return;
             if (noPiP() || activity.isInPictureInPictureMode() || !PlayerSetting.isBackgroundPiP()) return;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setSeamlessResizeEnabled(true);
             if (scale == 1) builder.setAspectRatio(new Rational(16, 9));

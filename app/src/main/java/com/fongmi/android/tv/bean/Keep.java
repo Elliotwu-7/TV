@@ -9,6 +9,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Diffable;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -48,11 +49,13 @@ public class Keep implements Diffable<Keep> {
     }
 
     public static Keep find(int cid, String key) {
-        return AppDatabase.get().getKeepDao().find(cid, key);
+        Keep item = AppDatabase.get().getKeepDao().find(cid, key);
+        return item == null || SensitiveContent.isRecordVisible(item.getSiteKey(), item.getSiteName(), item.getVodName()) ? item : null;
     }
 
     public static boolean exist(String key) {
-        return AppDatabase.get().getKeepDao().find(key) != null;
+        Keep item = AppDatabase.get().getKeepDao().find(key);
+        return item != null && SensitiveContent.isRecordVisible(item.getSiteKey(), item.getSiteName(), item.getVodName());
     }
 
     public static void deleteAll() {
@@ -68,7 +71,7 @@ public class Keep implements Diffable<Keep> {
     }
 
     public static List<Keep> getVod() {
-        return AppDatabase.get().getKeepDao().getVod();
+        return AppDatabase.get().getKeepDao().getVod().stream().filter(item -> SensitiveContent.isRecordVisible(item.getSiteKey(), item.getSiteName(), item.getVodName())).toList();
     }
 
     public static List<Keep> getLive() {

@@ -57,7 +57,7 @@ public class Util {
         }
     }
 
-    private static boolean isAutomotive(Context context) {
+    public static boolean isAutomotive(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE);
     }
 

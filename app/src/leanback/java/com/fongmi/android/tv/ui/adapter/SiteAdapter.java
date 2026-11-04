@@ -12,6 +12,7 @@ import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
 import com.fongmi.android.tv.setting.Setting;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     private void addAll() {
-        for (Site site : VodConfig.get().getSites()) if (!site.isHide()) mItems.add(site);
+        for (Site site : VodConfig.get().getSites()) if (!site.isHide() && SensitiveContent.isSiteVisible(site)) mItems.add(site);
     }
 
     public List<Site> getItems() {

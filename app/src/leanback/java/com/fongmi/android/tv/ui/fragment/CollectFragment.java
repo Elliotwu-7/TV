@@ -28,6 +28,7 @@ import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -104,7 +105,8 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
     }
 
     public void addVideo(List<Vod> items) {
-        if (checkLastSize(items) || getActivity() == null || getActivity().isFinishing()) return;
+        items = SensitiveContent.filterVods(items);
+        if (items.isEmpty() || checkLastSize(items) || getActivity() == null || getActivity().isFinishing()) return;
         List<ListRow> rows = new ArrayList<>();
         VodPresenter presenter = new VodPresenter(this);
         for (List<Vod> part : Lists.partition(items, Product.getColumn())) {

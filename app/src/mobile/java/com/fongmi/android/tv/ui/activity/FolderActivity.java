@@ -16,13 +16,14 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.databinding.ActivityFolderBinding;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.FolderFragment;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 public class FolderActivity extends BaseActivity {
 
     private ActivityFolderBinding mBinding;
 
     public static void start(Activity activity, String key, Result result) {
-        if (result == null || result.getTypes().isEmpty()) return;
+        if (result == null || SensitiveContent.filterTypes(result.getTypes()).isEmpty()) return;
         Intent intent = new Intent(activity, FolderActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);
@@ -51,7 +52,7 @@ public class FolderActivity extends BaseActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
         setSupportActionBar(mBinding.toolbar);
-        Class type = getResult().getTypes().get(0);
+        Class type = SensitiveContent.filterTypes(getResult().getTypes()).get(0);
         setTitle(type.getTypeName());
         getSupportFragmentManager().beginTransaction().replace(R.id.container, FolderFragment.newInstance(getKey(), type, 8), "0").commit();
     }

@@ -16,6 +16,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.SiteListener;
 import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.google.android.material.textview.MaterialTextView;
 
 import java.util.List;
@@ -85,7 +86,7 @@ public class CustomTitleView extends MaterialTextView {
     }
 
     private List<Site> getSites() {
-        return VodConfig.get().getSites().stream().filter(site -> !site.isHide()).toList();
+        return VodConfig.get().getSites().stream().filter(site -> !site.isHide() && SensitiveContent.isSiteVisible(site)).toList();
     }
 
     public interface Listener extends SiteListener {

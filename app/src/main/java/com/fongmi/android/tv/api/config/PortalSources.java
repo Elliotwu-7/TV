@@ -8,6 +8,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.fongmi.android.tv.api.Decoder;
@@ -24,6 +25,7 @@ import java.io.BufferedInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import okhttp3.Call;
 import okhttp3.Request;
@@ -39,6 +41,7 @@ public final class PortalSources {
     private static final Object[] LOCKS = {new Object(), new Object()};
     private static final List<?>[] CATALOGS = new List<?>[2];
     private static final long[] LOADED = new long[2];
+    private static final AtomicBoolean REFRESHING = new AtomicBoolean();
     private static JsonObject site;
     private static long siteLoaded;
 
@@ -55,6 +58,23 @@ public final class PortalSources {
     }
 
     public static String vod(Config config, String tag) throws Exception {
+        String cached = cachedConfig(config.getJson());
+        if (!cached.isEmpty()) {
+            refreshInBackground(config, tag);
+            return cached;
+        }
+        if (isHome(config.getUrl())) {
+            String bundled = bundledConfig();
+            if (!bundled.isEmpty()) {
+                config.json(bundled).save();
+                refreshInBackground(config, tag);
+                return bundled;
+            }
+        }
+        return loadNetwork(config, tag, true);
+    }
+
+    private static String loadNetwork(Config config, String tag, boolean notifyCached) throws Exception {
         if (!isHome(config.getUrl()) && !knownSource(config.getUrl())) {
             String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), tag);
             json = normalize(config.getUrl(), json, tag);
@@ -84,13 +104,36 @@ public final class PortalSources {
                 if (e.getMessage() != null && e.getMessage().contains("spider JAR")) break;
             }
         }
-        String cached = cachedConfig(config.getJson(), config.getUrl(), tag);
+        String cached = cachedConfig(config.getJson());
         if (!cached.isEmpty()) {
             config.json(cached).save();
-            Notify.show(R.string.z10_sources_cached);
+            if (notifyCached) Notify.show(R.string.z10_sources_cached);
             return cached;
         }
         throw new IOException("点播源暂不可用，请在设置中切换数据源", failure);
+    }
+
+    private static void refreshInBackground(Config config, String tag) {
+        if (!REFRESHING.compareAndSet(false, true)) return;
+        Task.submit(() -> {
+            try {
+                if (isHome(config.getUrl())) catalog(0, tag, true);
+                else loadNetwork(config, tag, false);
+            } catch (Throwable e) {
+                if (!Thread.currentThread().isInterrupted()) Log.w(TAG, "Background source refresh failed", e);
+            } finally {
+                REFRESHING.set(false);
+            }
+        });
+    }
+
+    private static String bundledConfig() {
+        try (InputStream stream = App.get().getAssets().open("z10/bootstrap.json")) {
+            return cachedConfig(Path.read(stream));
+        } catch (Exception e) {
+            Log.w(TAG, "Bundled source config unavailable", e);
+            return "";
+        }
     }
 
     private static String normalize(String source, String json, String tag) throws Exception {
@@ -100,10 +143,13 @@ public final class PortalSources {
         return isX86() ? adaptForX86(object) : json;
     }
 
-    private static String cachedConfig(String json, String source, String tag) {
+    private static String cachedConfig(String json) {
         if (json == null || json.isEmpty()) return "";
         try {
-            return normalize(source, json, tag);
+            JsonObject object = JsonParser.parseString(json).getAsJsonObject();
+            if (PortalCatalog.array(object, "sites").isEmpty() && PortalCatalog.array(object, "urls").isEmpty()) return "";
+            if (isX86() && PortalCatalog.array(object, "urls").isEmpty() && !hasSystemApiSite(object)) return "";
+            return isX86() ? adaptForX86(object) : json;
         } catch (Exception e) {
             return "";
         }

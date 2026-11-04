@@ -21,8 +21,8 @@ android {
         applicationId "com.z10.box"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        versionCode 3
-        versionName "1.0.2-z10"
+        versionCode 4
+        versionName "1.0.3-z10"
         buildConfigField "boolean", "Z10_SYSTEM_CODECS", "true"
         javaCompileOptions {
             annotationProcessorOptions {

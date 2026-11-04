@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -46,7 +47,18 @@ public class Util {
         WindowInsetsControllerCompat insets = WindowCompat.getInsetsController(window, window.getDecorView());
         insets.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        insets.hide(WindowInsetsCompat.Type.systemBars());
+        if (isAutomotive(window.getContext())) {
+            // Automotive system bars contain the launcher/home controls. Keep the
+            // navigation bar available while hiding only the top status bar.
+            insets.show(WindowInsetsCompat.Type.navigationBars());
+            insets.hide(WindowInsetsCompat.Type.statusBars());
+        } else {
+            insets.hide(WindowInsetsCompat.Type.systemBars());
+        }
+    }
+
+    private static boolean isAutomotive(Context context) {
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE);
     }
 
     public static void showSystemUI(Activity activity) {

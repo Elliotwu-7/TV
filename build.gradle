@@ -11,6 +11,7 @@ tasks.register('clean', Delete) {
 project(':app').tasks.matching { it.name ==~ /assemble.+Release/ }.configureEach {
     doLast {
         copy {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             from fileTree("$rootDir/app/build/outputs/apk") { include '**/release/*.apk' }
             into "$rootDir/Release/apk"
             eachFile { it.path = it.name }

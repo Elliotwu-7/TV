@@ -10,6 +10,7 @@ import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.exception.ExtractException;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.github.catvod.utils.Trans;
 
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private void execute(TaskType type, MutableLiveData<Result> liveData, Callable<Result> callable) {
-        tasks.execute(type, Constant.TIMEOUT_VOD, callable, liveData::postValue, error -> {
+        tasks.execute(type, Constant.TIMEOUT_VOD, () -> SensitiveContent.filterResult(callable.call()), liveData::postValue, error -> {
             if (error instanceof ExtractException) liveData.postValue(Result.error(error.getMessage()));
             else liveData.postValue(Result.empty());
             error.printStackTrace();
@@ -124,7 +125,7 @@ public class SiteViewModel extends ViewModel {
         @Override
         public Result call() throws Exception {
             if (quick && !site.isQuickSearch()) return Result.empty();
-            return SiteApi.searchContent(site, keyword, quick, page);
+            return SensitiveContent.filterResult(SiteApi.searchContent(site, keyword, quick, page));
         }
     }
 

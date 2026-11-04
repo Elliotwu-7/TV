@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Value;
+import com.fongmi.android.tv.databinding.DialogPassBinding;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.ConfigEvent;
@@ -45,8 +47,11 @@ import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import org.greenrobot.eventbus.EventBus;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -97,6 +102,7 @@ public class VodFragment extends BaseFragment implements ConfigListener, SiteLis
     protected void initEvent() {
         mBinding.top.setOnClickListener(this::onTop);
         mBinding.logo.setOnClickListener(this::onLogo);
+        mBinding.logo.setOnLongClickListener(this::onLogoLong);
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.title.setOnClickListener(this::onSite);
         mBinding.filter.setOnClickListener(this::onFilter);
@@ -174,6 +180,38 @@ public class VodFragment extends BaseFragment implements ConfigListener, SiteLis
 
     private void onLogo(View view) {
         HistoryDialog.create().vod().readOnly().show(this);
+    }
+
+    private boolean onLogoLong(View view) {
+        DialogPassBinding binding = DialogPassBinding.inflate(getLayoutInflater());
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
+                .setTitle(R.string.z10_sensitive_title)
+                .setView(binding.getRoot())
+                .setNegativeButton(R.string.dialog_negative, null)
+                .setPositiveButton(R.string.dialog_positive, null)
+                .create();
+        dialog.setOnShowListener(ignored -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
+                String password = binding.pass.getText().toString();
+                if (!SensitiveContent.isPassword(password)) {
+                    binding.pass.setError(getString(R.string.z10_sensitive_invalid));
+                    return;
+                }
+                if (!VodConfig.get().openSensitive(password)) {
+                    Notify.show(R.string.z10_sensitive_unavailable);
+                    return;
+                }
+                dialog.dismiss();
+            });
+            binding.pass.setOnEditorActionListener((textView, actionId, event) -> {
+                if (actionId != EditorInfo.IME_ACTION_DONE) return false;
+                dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).performClick();
+                return true;
+            });
+            binding.pass.requestFocus();
+        });
+        dialog.show();
+        return true;
     }
 
     private void onSite(View view) {

@@ -13,6 +13,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.bean.Header;
@@ -181,15 +182,17 @@ public class VodConfig extends BaseConfig {
         setSites(Json.safeListElement(object, "sites").stream().map(e -> Site.objectFrom(e, spider)).filter(site -> !site.isEmpty()).distinct().collect(Collectors.toCollection(ArrayList::new)));
         Map<String, Site> items = Site.findAll().stream().collect(Collectors.toMap(Site::getKey, Function.identity()));
         getSites().forEach(site -> site.sync(items.get(site.getKey())));
-        setHome(config, getSites().isEmpty() ? new Site() : getSites().stream().filter(item -> item.getKey().equals(config.getHome())).findFirst().orElseGet(this::getDefaultHome), false);
+        List<Site> available = getSites().stream().filter(SensitiveContent::isSiteVisible).toList();
+        Site selected = available.stream().filter(item -> item.getKey().equals(config.getHome())).findFirst().orElseGet(() -> getDefaultHome(available));
+        setHome(config, selected, false);
     }
 
-    private Site getDefaultHome() {
-        if (!PortalSources.isX86()) return getSites().get(0);
-        return getSites().stream().filter(item -> item.getType() == 4 && item.getApi().toLowerCase().contains("cj")).findFirst()
-                .or(() -> getSites().stream().filter(item -> item.getType() == 4 && item.getSearchable() > 0).findFirst())
-                .or(() -> getSites().stream().filter(item -> item.getType() == 1 && item.getSearchable() > 0).findFirst())
-                .orElse(getSites().get(0));
+    private Site getDefaultHome(List<Site> available) {
+        if (available.isEmpty()) return new Site();
+        if (!PortalSources.isX86()) return available.get(0);
+        return available.stream().filter(item -> item.getType() == 4 && item.getSearchable() > 0).findFirst()
+                .or(() -> available.stream().filter(item -> item.getType() == 1 && item.getSearchable() > 0).findFirst())
+                .orElse(available.get(0));
     }
 
     private void initParse(Config config, JsonObject object) {
@@ -272,6 +275,13 @@ public class VodConfig extends BaseConfig {
 
     public Site getHome() {
         return home == null ? new Site() : home;
+    }
+
+    public boolean openSensitive(String password) {
+        Site site = getSites().stream().filter(SensitiveContent::isSensitiveSite).findFirst().orElse(null);
+        if (site == null || !SensitiveContent.unlock(password)) return false;
+        setHome(site);
+        return true;
     }
 
     public void setHome(Site site) {

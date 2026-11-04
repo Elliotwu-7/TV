@@ -99,6 +99,7 @@ import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Timer;
 import com.fongmi.android.tv.utils.Traffic;
@@ -176,6 +177,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean collect) {
+        if (!SensitiveContent.isLaunchVisible(key, name)) return;
         Intent intent = new Intent(activity, VideoActivity.class);
         intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
@@ -268,6 +270,10 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     @Override
     protected void onServiceConnected() {
+        if (!SensitiveContent.isSiteVisible(getSite())) {
+            finish();
+            return;
+        }
         checkLand();
         checkId();
     }
@@ -275,6 +281,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     protected void onNewIntent(Intent intent) {
         String oldId = getId();
+        String key = Objects.toString(intent.getStringExtra("key"), getKey());
+        String name = Objects.toString(intent.getStringExtra("name"), getName());
+        if (!SensitiveContent.isLaunchVisible(key, name)) return;
         super.onNewIntent(intent);
         String id = Objects.toString(intent.getStringExtra("id"), "");
         if (TextUtils.isEmpty(id) || id.equals(oldId)) return;
@@ -421,6 +430,10 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     private void onDetailObserved(Result result) {
         if (service() == null) return;
+        if (!SensitiveContent.isSiteVisible(getSite()) || !SensitiveContent.isVodVisible(result.getVod())) {
+            showEmpty();
+            return;
+        }
         mVod.onDetailResult(result);
     }
 
@@ -511,6 +524,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     @Override
     public void prepareSource(Vod item) {
+        if (!SensitiveContent.isVodVisible(item)) return;
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("pic", item.getPic());
         getIntent().putExtra("id", item.getId());

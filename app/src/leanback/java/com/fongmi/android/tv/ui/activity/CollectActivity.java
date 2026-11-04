@@ -23,6 +23,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityCollectBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.setting.Setting;
@@ -30,6 +31,7 @@ import com.fongmi.android.tv.ui.adapter.CollectAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.CollectFragment;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -107,9 +109,10 @@ public class CollectActivity extends BaseActivity {
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.getSearch().observe(this, result -> {
-            if (result.getList().isEmpty()) return;
-            getFragment().addVideo(result.getList());
-            mAdapter.add(Collect.create(result.getList()));
+            List<Vod> items = SensitiveContent.filterVods(result.getList());
+            if (items.isEmpty()) return;
+            getFragment().addVideo(items);
+            mAdapter.add(Collect.create(items));
             mBinding.pager.getAdapter().notifyDataSetChanged();
         });
     }
@@ -123,7 +126,7 @@ public class CollectActivity extends BaseActivity {
     }
 
     private void setSites() {
-        mSites = VodConfig.get().getSites().stream().filter(Site::isSearchable).toList();
+        mSites = VodConfig.get().getSites().stream().filter(Site::isSearchable).filter(SensitiveContent::isSiteVisible).toList();
     }
 
     private void setPager() {

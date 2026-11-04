@@ -30,6 +30,7 @@ import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import java.util.List;
 
@@ -106,7 +107,7 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     }
 
     private void setSites() {
-        mSites = VodConfig.get().getSites().stream().filter(Site::isSearchable).toList();
+        mSites = VodConfig.get().getSites().stream().filter(Site::isSearchable).filter(SensitiveContent::isSiteVisible).toList();
     }
 
     private void setWidth() {
@@ -135,18 +136,21 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     }
 
     private void setCollect(Result result) {
-        if (result == null || result.getList().isEmpty()) return;
-        if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addAll(result.getList());
-        mCollectAdapter.add(Collect.create(result.getList()));
-        mCollectAdapter.add(result.getList());
+        if (result == null) return;
+        List<Vod> items = SensitiveContent.filterVods(result.getList());
+        if (items.isEmpty()) return;
+        if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addAll(items);
+        mCollectAdapter.add(Collect.create(items));
+        mCollectAdapter.add(items);
     }
 
     private void setSearch(Result result) {
         if (result == null) return;
+        List<Vod> items = SensitiveContent.filterVods(result.getList());
         mScroller.endLoading(result);
-        boolean same = !result.getList().isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getVod().getSite());
-        if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
-        if (same) mSearchAdapter.addAll(result.getList());
+        boolean same = !items.isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getVod().getSite());
+        if (same) mCollectAdapter.getActivated().getList().addAll(items);
+        if (same) mSearchAdapter.addAll(items);
     }
 
     @Override

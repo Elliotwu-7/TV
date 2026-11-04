@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.Cache;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.databinding.AdapterTypeBinding;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     public void addAll(List<Class> items) {
         mItems.clear();
-        mItems.addAll(items);
+        mItems.addAll(SensitiveContent.filterTypes(items));
         notifyDataSetChanged();
     }
 

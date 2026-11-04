@@ -84,6 +84,7 @@ import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PartUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SensitiveContent;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.UrlUtil;
@@ -163,6 +164,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean collect, boolean cast) {
+        if (!SensitiveContent.isLaunchVisible(key, name)) return;
         Intent intent = new Intent(activity, VideoActivity.class);
         intent.putExtra("collect", collect);
         intent.putExtra("cast", cast);
@@ -248,12 +250,19 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onServiceConnected() {
+        if (!SensitiveContent.isSiteVisible(getSite())) {
+            finish();
+            return;
+        }
         checkId();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         String oldId = getId();
+        String key = Objects.toString(intent.getStringExtra("key"), getKey());
+        String name = Objects.toString(intent.getStringExtra("name"), getName());
+        if (!SensitiveContent.isLaunchVisible(key, name)) return;
         super.onNewIntent(intent);
         String id = Objects.toString(intent.getStringExtra("id"), "");
         if (TextUtils.isEmpty(id) || id.equals(oldId)) return;
@@ -380,6 +389,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     private void onDetailObserved(Result result) {
         if (service() == null) return;
+        if (!SensitiveContent.isSiteVisible(getSite()) || !SensitiveContent.isVodVisible(result.getVod())) {
+            showEmpty();
+            return;
+        }
         mVod.onDetailResult(result);
     }
 
@@ -470,6 +483,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void prepareSource(Vod item) {
+        if (!SensitiveContent.isVodVisible(item)) return;
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("pic", item.getPic());
         getIntent().putExtra("id", item.getId());

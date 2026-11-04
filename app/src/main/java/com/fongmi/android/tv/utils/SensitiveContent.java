@@ -14,7 +14,11 @@ public final class SensitiveContent {
 
     private static final String PASSWORD = "miao";
     private static final List<String> SITE_KEYS = List.of("采集集合", "js集合", "php集合", "python集合");
-    private static final List<String> SITE_APIS = List.of("/cj/cjjh.php", "cjjh.php");
+    private static final List<String> SITE_KEYWORDS = List.of(
+            "NSFW", "R18", "R-18", "瑟瑟", "涩涩", "色色", "福利资源", "成人资源",
+            "里番", "伦理", "禁漫", "H漫", "JAV", "AV资源", "AV视频", "AV片", "麻豆");
+    private static final List<String> SITE_APIS = List.of(
+            "/cj/cjjh.php", "cjjh.php", "/js.php", "/php.php", "/py.php");
     private static final List<String> CONTENT_KEYWORDS = List.of(
             "瑟瑟", "涩涩", "色色", "黄片", "A片", "AV片", "无码", "有码", "麻豆传媒",
             "制服诱惑", "三级伦理", "三级片", "AI换脸", "色情", "情色", "淫秽", "成人视频",
@@ -52,7 +56,9 @@ public final class SensitiveContent {
     }
 
     public static boolean isSensitiveSite(String key, String name, String api) {
-        return contains(key, SITE_KEYS) || contains(name, SITE_KEYS) || contains(api, SITE_APIS);
+        return contains(key, SITE_KEYS) || contains(name, SITE_KEYS)
+                || contains(key, SITE_KEYWORDS) || contains(name, SITE_KEYWORDS)
+                || contains(api, SITE_APIS);
     }
 
     public static boolean isSensitiveType(Class type) {
